@@ -1,0 +1,1 @@
+g++ -Wall src/*.cpp -o main -mwindows `pkg-config gtkmm-3.0 --cflags --libs`
