@@ -1,5 +1,7 @@
 #include "MainFrame.h"
 
+#include "ViewFrame.h"
+
 #include <string>
 
 MainFrame::MainFrame()
@@ -13,6 +15,11 @@ MainFrame::MainFrame()
       btnSave("Save All"),
       lblOpen1("Select source file:"),
       lblOpen2("None")
+{
+    buildGUI();
+}
+
+void MainFrame::buildGUI()
 {
     set_title("Graf Lab1");
     set_border_width(5);
@@ -35,13 +42,17 @@ MainFrame::MainFrame()
     rootBox.pack_start(boxToolProcess, Gtk::PACK_SHRINK);
     rootBox.pack_start(sepOpen, Gtk::PACK_SHRINK);
     buildPorts();
-    rootBox.pack_start(boxPorts, Gtk::PACK_SHRINK);
+    rootBox.pack_start(scrolledWindow, Gtk::PACK_EXPAND_WIDGET);
 
     btnOpen.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_open_clicked));
-    btnShowSrc.signal_clicked().connect(sigc::bind<-1, Glib::ustring>(
-        sigc::mem_fun(*this, &MainFrame::btn_show_clicked), "src"));
+    btnShowSrc.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_show_clicked));
     btnProcess.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_process_clicked));
     btnSave.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_save_clicked));
+
+    lblOpen2.set_text("None");
+    btnShowSrc.set_sensitive(false);
+    btnProcess.set_sensitive(false);
+    btnSave.set_sensitive(false);
 
     show_all_children();
 }
@@ -52,14 +63,34 @@ MainFrame::~MainFrame()
 
 void MainFrame::buildPorts()
 {
-    Gtk::Box *box1 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
-    Gtk::Label *lbl = Gtk::make_managed<Gtk::Label>("Grayscale");
-    Gtk::Button *btnShow = Gtk::make_managed<Gtk::Button>("Show");
-    btnShow->signal_clicked().connect(sigc::bind<-1, Glib::ustring>(
-        sigc::mem_fun(*this, &MainFrame::btn_show_clicked), "grayscale"));
-    box1->pack_start(*btnShow, Gtk::PACK_SHRINK);
-    box1->pack_start(*lbl, Gtk::PACK_SHRINK);
-    boxPorts.pack_start(*box1, Gtk::PACK_SHRINK);
+    scrolledWindow.add(lstPorts);
+    scrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    refTreeModel = Gtk::ListStore::create(portsColumns);
+    lstPorts.set_model(refTreeModel);
+
+    for (auto it = scheme.ports.begin(); it != scheme.ports.end(); ++it)
+    {
+        Gtk::TreeModel::Row row = *(refTreeModel->append());
+        row[portsColumns.col_btn] = it->tag;
+        row[portsColumns.col_descript] = it->description;
+        row[portsColumns.col_tag] = it->tag;
+    }
+
+    auto cell = Gtk::make_managed<Gtk::CellRendererToggle>();
+    lstPorts.append_column("Result", *cell);
+    cell->signal_toggled().connect(
+        sigc::mem_fun(*this, &MainFrame::cellrenderer_on_toogle));
+    lstPorts.append_column("Description", portsColumns.col_descript);
+    lstPorts.append_column("Tag", portsColumns.col_tag);
+}
+
+// TODO build port list from scheme
+void MainFrame::addPort(Glib::ustring tag, Glib::ustring descript)
+{
+    Gtk::TreeModel::Row row = *(refTreeModel->append());
+    row[portsColumns.col_btn] = tag;
+    row[portsColumns.col_descript] = descript;
+    row[portsColumns.col_tag] = tag;
 }
 
 void MainFrame::btn_open_clicked()
@@ -72,20 +103,25 @@ void MainFrame::btn_open_clicked()
     filter_image->set_name("Image files");
     filter_image->add_mime_type("image/jpeg");
     dialog.add_filter(filter_image);
-    dialog.set_current_folder("../media/");
+    dialog.set_current_folder("../media/color/");
     int result = dialog.run();
     switch (result)
     {
     case (Gtk::RESPONSE_OK):
     {
-        std::string filename = dialog.get_filename();
-        lblOpen2.set_text(filename);
+        fileName = dialog.get_filename();
+        lblOpen2.set_text(fileName);
+        btnShowSrc.set_sensitive(true);
+        btnProcess.set_sensitive(true);
         break;
     }
     case (Gtk::RESPONSE_CANCEL):
     default:
     {
         lblOpen2.set_text("None");
+        btnShowSrc.set_sensitive(false);
+        btnProcess.set_sensitive(false);
+        btnSave.set_sensitive(false);
         break;
     }
     }
@@ -96,6 +132,8 @@ void MainFrame::btn_process_clicked()
     Gtk::MessageDialog dialog(*this, "Processing");
     dialog.set_secondary_text("stub");
     dialog.run();
+// todo
+    btnSave.set_sensitive(true);
 }
 
 void MainFrame::btn_save_clicked()
@@ -104,11 +142,13 @@ void MainFrame::btn_save_clicked()
     dialog.set_transient_for(*this);
     dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
     dialog.add_button("_Open", Gtk::RESPONSE_OK);
+    dialog.set_current_folder("");
     int result = dialog.run();
     switch (result)
     {
     case (Gtk::RESPONSE_OK):
     {
+        // todo
         Gtk::MessageDialog dialog(*this, "Saving");
         dialog.set_secondary_text("stub");
         dialog.run();
@@ -117,9 +157,27 @@ void MainFrame::btn_save_clicked()
     }
 }
 
-void MainFrame::btn_show_clicked(Glib::ustring tag)
+void MainFrame::btn_show_clicked()
+{
+    ImagePort imagePort;
+    imagePort.fileName = fileName;
+    imagePort.tag = "src";
+    imagePort.description = "Source";
+    // imagePort.image = ...
+    viewFrame.showPort(imagePort);
+}
+
+void MainFrame::cellrenderer_on_toogle(const Glib::ustring &path)
 {
     Gtk::MessageDialog dialog(*this, "Showing");
-    dialog.set_secondary_text(tag);
+    dialog.set_secondary_text(path);
     dialog.run();
+
+    ImagePort imagePort;
+    imagePort.fileName = fileName;
+    PortRecord rec = scheme.ports[std::atoi(path.c_str())];
+    imagePort.tag = rec.tag;
+    imagePort.description = rec.description;
+    // imagePort.image = ...
+    viewFrame.showPort(imagePort);
 }
