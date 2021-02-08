@@ -1,10 +1,5 @@
 #include "LabScheme1.h"
 
-void LabScheme1::process()
-{
-
-}
-
 LabScheme1::LabScheme1()
 {
     ports.push_back(PortRecord("gray", "Grayscale"));
@@ -14,31 +9,33 @@ LabScheme1::~LabScheme1()
 {
 }
 
-bool LabScheme1::loadImage(std::string filePath)
+void LabScheme1::process()
+{
+
+}
+
+void LabScheme1::loadImage(std::string filePath)
 {
     this->filePath = filePath;
     try
     {
         this->source = Gdk::Pixbuf::create_from_file(filePath);
-        return true;
     }
     catch (const Gio::ResourceError &ex)
     {
-        return false;
+        throw IPF::Image_File_Error("Resource Error");
     }
     catch (const Gdk::PixbufError &ex)
     {
-        return false;
+        throw IPF::Image_File_Error("Pixbuf Error");
     }
 }
 
 ImagePort LabScheme1::getImagePort(int index)
 {
-    std::cout << "> getImagePort" << std::endl;
     ImagePort result;
     PortRecord port = ports[index];
-    std::cout << "! getImagePort" << std::endl;
-    result.image = images[index];
+    result.image = resultsPixbuf[index];
     result.fileName = filePath;
     result.description = port.description;
     result.tag = port.tag;

@@ -101,15 +101,18 @@ void MainFrame::btn_open_clicked()
     case (Gtk::RESPONSE_OK):
     {
         fileName = dialog.get_filename();
-        bool success = scheme.loadImage(fileName);
-        if (success)
+        try
         {
+            scheme.loadImage(fileName);
             lblOpen2.set_text(fileName);
             btnShowSrc.set_sensitive(true);
             btnProcess.set_sensitive(true);
         }
-        else
+        catch (std::string message)
         {
+            Gtk::MessageDialog dialog(*this, "Error", false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_CLOSE);
+            dialog.set_secondary_text(message);
+            dialog.run();
         }
         break;
     }
