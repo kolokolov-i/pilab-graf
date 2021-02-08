@@ -71,7 +71,7 @@ void MainFrame::buildPorts()
     for (auto it = scheme.ports.begin(); it != scheme.ports.end(); ++it)
     {
         Gtk::TreeModel::Row row = *(refTreeModel->append());
-        row[portsColumns.col_btn] = it->tag;
+        row[portsColumns.col_btn] = "btn";
         row[portsColumns.col_descript] = it->description;
         row[portsColumns.col_tag] = it->tag;
     }
@@ -82,15 +82,6 @@ void MainFrame::buildPorts()
         sigc::mem_fun(*this, &MainFrame::cellrenderer_on_toogle));
     lstPorts.append_column("Description", portsColumns.col_descript);
     lstPorts.append_column("Tag", portsColumns.col_tag);
-}
-
-// TODO build port list from scheme
-void MainFrame::addPort(Glib::ustring tag, Glib::ustring descript)
-{
-    Gtk::TreeModel::Row row = *(refTreeModel->append());
-    row[portsColumns.col_btn] = tag;
-    row[portsColumns.col_descript] = descript;
-    row[portsColumns.col_tag] = tag;
 }
 
 void MainFrame::btn_open_clicked()
@@ -110,9 +101,16 @@ void MainFrame::btn_open_clicked()
     case (Gtk::RESPONSE_OK):
     {
         fileName = dialog.get_filename();
-        lblOpen2.set_text(fileName);
-        btnShowSrc.set_sensitive(true);
-        btnProcess.set_sensitive(true);
+        bool success = scheme.loadImage(fileName);
+        if (success)
+        {
+            lblOpen2.set_text(fileName);
+            btnShowSrc.set_sensitive(true);
+            btnProcess.set_sensitive(true);
+        }
+        else
+        {
+        }
         break;
     }
     case (Gtk::RESPONSE_CANCEL):
@@ -129,10 +127,7 @@ void MainFrame::btn_open_clicked()
 
 void MainFrame::btn_process_clicked()
 {
-    Gtk::MessageDialog dialog(*this, "Processing");
-    dialog.set_secondary_text("stub");
-    dialog.run();
-// todo
+    scheme.process();
     btnSave.set_sensitive(true);
 }
 
@@ -159,25 +154,10 @@ void MainFrame::btn_save_clicked()
 
 void MainFrame::btn_show_clicked()
 {
-    ImagePort imagePort;
-    imagePort.fileName = fileName;
-    imagePort.tag = "src";
-    imagePort.description = "Source";
-    // imagePort.image = ...
-    viewFrame.showPort(imagePort);
+    viewFrame.showPort(scheme.getImagePortSrc());
 }
 
 void MainFrame::cellrenderer_on_toogle(const Glib::ustring &path)
 {
-    Gtk::MessageDialog dialog(*this, "Showing");
-    dialog.set_secondary_text(path);
-    dialog.run();
-
-    ImagePort imagePort;
-    imagePort.fileName = fileName;
-    PortRecord rec = scheme.ports[std::atoi(path.c_str())];
-    imagePort.tag = rec.tag;
-    imagePort.description = rec.description;
-    // imagePort.image = ...
-    viewFrame.showPort(imagePort);
+    viewFrame.showPort(scheme.getImagePort(std::atoi(path.c_str())));
 }

@@ -20,7 +20,6 @@ protected:
     void cellrenderer_on_toogle(const Glib::ustring &path);
 
     void buildPorts();
-    void addPort(Glib::ustring tag, Glib::ustring descript);
 
     Gtk::Box rootBox, boxToolOpen, boxToolProcess, boxPorts;
     Gtk::Button btnOpen, btnShowSrc, btnProcess, btnSave;

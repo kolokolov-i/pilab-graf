@@ -6,7 +6,7 @@
 
 class ViewFrame : public Gtk::Window
 {
-    public:
+public:
     ViewFrame();
     virtual ~ViewFrame();
 
@@ -14,7 +14,7 @@ class ViewFrame : public Gtk::Window
 
     void btn_save_clicked();
 
-    protected:
+protected:
     Gtk::Box rootBox, boxTool;
     Gtk::Button btnSave;
     Gtk::Label lblDescription;

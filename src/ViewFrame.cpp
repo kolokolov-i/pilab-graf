@@ -4,11 +4,12 @@
 
 #include <gtkmm.h>
 
+#include <iostream>
+
 ViewFrame::ViewFrame()
-:
-    rootBox(Gtk::ORIENTATION_VERTICAL),
-    boxTool(Gtk::ORIENTATION_HORIZONTAL),
-    btnSave("Save")
+    : rootBox(Gtk::ORIENTATION_VERTICAL),
+      boxTool(Gtk::ORIENTATION_HORIZONTAL),
+      btnSave("Save")
 {
     set_title("View");
     boxTool.pack_start(lblDescription, Gtk::PACK_SHRINK);
@@ -22,14 +23,19 @@ ViewFrame::ViewFrame()
 
 ViewFrame::~ViewFrame()
 {
-
 }
 
 void ViewFrame::showPort(ImagePort port)
 {
-    lblDescription.set_text(port.description);
-    show_all_children();
-    show();
+    // std::cout << "showPort" << std::endl;
+    if (port.image)
+    {
+    // std::cout << "\tImage presense" << std::endl;
+        lblDescription.set_text(port.description);
+        imagePanel.set(port.image);
+        show_all_children();
+        show();
+    }
 }
 
 void ViewFrame::btn_save_clicked()
