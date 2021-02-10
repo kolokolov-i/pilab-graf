@@ -3,6 +3,7 @@
 LabScheme1::LabScheme1()
 {
     ports.push_back(PortRecord("gray", "Grayscale"));
+
 }
 
 LabScheme1::~LabScheme1()

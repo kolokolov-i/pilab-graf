@@ -1,8 +1,9 @@
 #include "MainFrame.h"
 
-#include "ViewFrame.h"
-
 #include <string>
+
+// TODO viewframe pool
+// TODO multithread processing
 
 MainFrame::MainFrame()
     : rootBox(Gtk::ORIENTATION_VERTICAL),

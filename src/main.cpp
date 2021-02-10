@@ -1,5 +1,5 @@
 #include <gtkmm.h>
-#include "MainFrame.h"
+#include "gui/MainFrame.h"
 
 int main(int argc, char *argv[])
 {

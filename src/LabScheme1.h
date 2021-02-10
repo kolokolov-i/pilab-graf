@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PortRecord.h"
-#include "ImagePort.h"
+#include "gui/ImagePort.h"
+#include "gui/PortRecord.h"
 #include "ipf/IPF.h"
 #include "ipf/MatrixD.h"
 

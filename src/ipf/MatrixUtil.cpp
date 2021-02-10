@@ -42,7 +42,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
             {
                 for (int jW = 0, kW = -krnKW; jW < krnW; jW++, kW++)
                 {
-                    double t = 0;
+                    double t;
                     int aW, aH;
                     aW = iW + kW;
                     aH = iH + kH;
@@ -105,6 +105,9 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             t = src[aH * w + aW];
                         }
                             break;
+                            case BorderResolver::Zero:
+                            default:
+                            t = 0;
                         }
                     }
                     else
@@ -145,7 +148,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
             {
                 for (int jW = 0, kW = -krnKW; jW < krnW; jW++, kW++)
                 {
-                    double t = 0;
+                    double t;
                     int aW, aH;
                     aW = iW + kW;
                     aH = iH + kH;
@@ -208,6 +211,9 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             t = src[aH * w + aW];
                         }
                             break;
+                            case BorderResolver::Zero:
+                            default:
+                            t = 0;
                         }
                     }
                     else

@@ -2,7 +2,7 @@
 
 #include "ViewFrame.h"
 #include "PortRecord.h"
-#include "LabScheme1.h"
+#include "../LabScheme1.h" // TODO reduce coupling
 
 #include <gtkmm.h>
 
