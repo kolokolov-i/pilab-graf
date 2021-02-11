@@ -18,9 +18,6 @@ protected:
     void btn_show_clicked();
     void cellrenderer_on_toogle(const Glib::ustring &path);
 
-    void buildPorts();
-    void resetSource();
-    void resetPorts();
 
     Gtk::Box rootBox, boxToolOpen, boxToolProcess, boxPorts;
     Gtk::Button btnOpen, btnShowSrc, btnProcess, btnSave;
@@ -54,4 +51,7 @@ protected:
 
 private:
     void buildGUI();
+    void buildPorts();
+    void resetSource();
+    void resetPorts();
 };

@@ -19,9 +19,6 @@ public:
     ~LabScheme1();
     void loadImage(std::string filePath);
     void updatePorts();
-    // Glib::RefPtr<Gdk::Pixbuf> getPixbuf(std::string tag);
-    // int getPortsCount();
-    // ImagePort getImagePort(int index);
     ImagePort getSourcePort();
     void process();
 

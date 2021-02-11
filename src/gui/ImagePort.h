@@ -17,4 +17,5 @@ public:
     Glib::ustring fileName;
 
     static ImagePort fromRecord(IPF::ImageRecord rec, std::string filePath);
+    void save(std::string path);
 };

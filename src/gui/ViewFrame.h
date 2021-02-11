@@ -20,4 +20,5 @@ protected:
     Gtk::Button btnSave;
     Gtk::Label lblDescription;
     Gtk::Image imagePanel;
+    ImagePort currentPort;
 };

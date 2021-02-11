@@ -174,10 +174,12 @@ void MainFrame::btn_save_clicked()
     {
     case (Gtk::RESPONSE_OK):
     {
-        // todo
-        Gtk::MessageDialog dialog(*this, "Saving");
-        dialog.set_secondary_text("stub");
-        dialog.run();
+        std::string path = dialog.get_filename();
+        scheme.getSourcePort().save(path);
+        for (auto iter = scheme.ports.begin(); iter != scheme.ports.end(); ++iter)
+        {
+            iter->save(path);
+        }
         break;
     }
     }
