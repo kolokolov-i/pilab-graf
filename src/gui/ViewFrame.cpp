@@ -22,12 +22,19 @@ ViewFrame::~ViewFrame()
 {
 }
 
+void ViewFrame::reset()
+{
+    hide();
+    lblDescription.set_text("");
+    imagePanel.clear();
+}
+
 void ViewFrame::showPort(ImagePort port)
 {
-    if (port.image)
+    if (!port.empty)
     {
         lblDescription.set_text(port.description);
-        imagePanel.set(port.image);
+        imagePanel.set(port.pixbuf);
         show_all_children();
         show();
     }

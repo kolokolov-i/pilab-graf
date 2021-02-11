@@ -1,5 +1,6 @@
-#include <gtkmm.h>
 #include "gui/MainFrame.h"
+
+#include <gtkmm.h>
 
 int main(int argc, char *argv[])
 {

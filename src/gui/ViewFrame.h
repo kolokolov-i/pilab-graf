@@ -10,6 +10,7 @@ public:
     ViewFrame();
     virtual ~ViewFrame();
 
+    void reset();
     void showPort(ImagePort port);
 
     void btn_save_clicked();

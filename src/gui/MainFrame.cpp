@@ -158,10 +158,10 @@ void MainFrame::btn_save_clicked()
 
 void MainFrame::btn_show_clicked()
 {
-    viewFrame.showPort(scheme.getImagePortSrc());
+    viewFrame.showPort(scheme.getSourcePort());
 }
 
 void MainFrame::cellrenderer_on_toogle(const Glib::ustring &path)
 {
-    viewFrame.showPort(scheme.getImagePort(std::atoi(path.c_str())));
+    viewFrame.showPort(scheme.ports[std::atoi(path.c_str())]);
 }
