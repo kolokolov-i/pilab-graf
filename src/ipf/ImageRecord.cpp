@@ -17,3 +17,10 @@ void ImageRecord::setMatrix(MatrixD *m)
     pixbuf = PixbufUtil::grayPixbuf(m);
     empty = false;
 }
+
+void ImageRecord::setMatrix(MatrixD *m, double min, double max)
+{
+    matrix.reset(m);
+    pixbuf = PixbufUtil::grayPixbuf(m, min, max);
+    empty = false;
+}

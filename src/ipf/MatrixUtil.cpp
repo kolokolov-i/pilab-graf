@@ -2,6 +2,7 @@
 
 #include "IPF.h"
 
+#include <iomanip>
 #include <cmath>
 
 using namespace IPF;
@@ -14,7 +15,7 @@ MatrixD *MatrixUtil::identity(int w)
         data[i * w + i] = 1;
     }
     MatrixD *resultMatrix = new MatrixD(w, w, data);
-    delete data;
+    delete[] data;
     return resultMatrix;
 }
 
@@ -69,7 +70,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aW = w - 1 - (aW % w);
                             }
-                            else if(aW < 0)
+                            else if (aW < 0)
                             {
                                 aW = -1 - (aW % w);
                             }
@@ -77,7 +78,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aH = h - 1 - (aH % h);
                             }
-                            else if(aH < 0)
+                            else if (aH < 0)
                             {
                                 aH = -1 - (aH % h);
                             }
@@ -90,7 +91,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aW = aW % w;
                             }
-                            else if(aW < 0)
+                            else if (aW < 0)
                             {
                                 aW = w + (aW % w);
                             }
@@ -98,15 +99,15 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aH = aH % h;
                             }
-                            else if(aH < 0)
+                            else if (aH < 0)
                             {
                                 aH = h + (aH % h);
                             }
                             t = src[aH * w + aW];
                         }
-                            break;
-                            case BorderResolver::Zero:
-                            default:
+                        break;
+                        case BorderResolver::Zero:
+                        default:
                             t = 0;
                         }
                     }
@@ -121,7 +122,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
         }
     }
     MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    delete[] result;
     return resultMatrix;
 }
 MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderResolver borderResolver)
@@ -175,7 +176,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aW = w - 1 - (aW % w);
                             }
-                            else if(aW < 0)
+                            else if (aW < 0)
                             {
                                 aW = -1 - (aW % w);
                             }
@@ -183,7 +184,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aH = h - 1 - (aH % h);
                             }
-                            else if(aH < 0)
+                            else if (aH < 0)
                             {
                                 aH = -1 - (aH % h);
                             }
@@ -196,7 +197,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aW = aW % w;
                             }
-                            else if(aW < 0)
+                            else if (aW < 0)
                             {
                                 aW = w + (aW % w);
                             }
@@ -204,15 +205,15 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aH = aH % h;
                             }
-                            else if(aH < 0)
+                            else if (aH < 0)
                             {
                                 aH = h + (aH % h);
                             }
                             t = src[aH * w + aW];
                         }
-                            break;
-                            case BorderResolver::Zero:
-                            default:
+                        break;
+                        case BorderResolver::Zero:
+                        default:
                             t = 0;
                         }
                     }
@@ -227,7 +228,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
         }
     }
     MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    delete[] result;
     return resultMatrix;
 }
 
@@ -238,31 +239,68 @@ MatrixD *MatrixUtil::kernelSingle(int sizeK)
     double *result = new double[w * h];
     result[w * sizeK + sizeK] = 1;
     MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    delete[] result;
     return resultMatrix;
 }
 
-MatrixD *MatrixUtil::kernelGauss(double variance, int sizeK)
+// Square matrix for Gaussian filter
+MatrixD *MatrixUtil::kernelGaussQ(double vrc, int sizeH)
 {
-    int w, h;
-    if (sizeK == 0)
+    if (sizeH == 0)
     {
-        sizeK = 3 * variance;
+        sizeH = 3 * vrc;
     }
-    w = h = sizeK * 2 + 1;
+    int mW, mH;
+    mW = mH = sizeH * 2 + 1;
+    double *result = new double[mW * mH];
     double pi = acos(-1.0);
-    double *result = new double[w * h];
-    for (int iH = 0, kH = -sizeK; iH < h; iH++, kH++)
+    double t1 = 2 * vrc * vrc;
+    double t2 = 1. / (t1 * pi);
+    for (int iH = 0, kH = -sizeH; iH < mH; iH++, kH++)
     {
-        for (int iW = 0, kW = -sizeK; iW < w; iW++, kW++)
+        for (int iW = 0, kW = -sizeH; iW < mW; iW++, kW++)
         {
-            double t = 2 * variance * variance;
-            double v = 1. / (pi * t) * exp(-(kW * kW + kH * kH) / t);
-            result[iH * w + iW] = v;
+            double v = t2 * exp(-(kW * kW + kH * kH) / t1);
+            result[iH * mW + iW] = v;
         }
     }
-    MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    MatrixD *resultMatrix = new MatrixD(mW, mH, result);
+    delete[] result;
+    return resultMatrix;
+}
+
+// Vector matrix for Gaussian filter
+MatrixD *MatrixUtil::kernelGaussV(double vrc, int sizeW, int sizeH)
+{
+    int mW, mH, mL;
+    if (sizeW == 0 && sizeH > 0)
+    {
+        mW = 1;
+        mH = sizeH * 2 + 1;
+        mL = sizeH;
+    }
+    else if (sizeH == 0 && sizeW > 0)
+    {
+        mW = sizeW * 2 + 1;
+        mH = 1;
+        mL = sizeW;
+    }
+    else
+    {
+        throw Invalid_Parameter("One of sizes must be zero");
+    }
+    int n = mW * mH;
+    double *result = new double[n];
+    double pi = acos(-1.0);
+    double t1 = 2 * vrc * vrc;
+    double t2 = 1. / (sqrt(2 * pi) * vrc);
+    for (int i = 0, k = -mL; i < n; i++, k++)
+    {
+        double v = t2 * exp(-(k * k) / t1);
+        result[i] = v;
+    }
+    MatrixD *resultMatrix = new MatrixD(mW, mH, result);
+    delete[] result;
     return resultMatrix;
 }
 
@@ -280,7 +318,7 @@ MatrixD *MatrixUtil::calc(MatrixD *matrix, double (*unaryFunction)(double a))
         *r = unaryFunction(*p1);
     }
     MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    delete[] result;
     return resultMatrix;
 }
 
@@ -304,6 +342,24 @@ MatrixD *MatrixUtil::calc(MatrixD *m1, MatrixD *m2, double (*binaryFunction)(dou
         *r = binaryFunction(*p1, *p2);
     }
     MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete result;
+    delete[] result;
     return resultMatrix;
+}
+
+void MatrixUtil::print(std::ostream &out, MatrixD *matrix)
+{
+    int w = matrix->getW();
+    int h = matrix->getH();
+    const double *table = matrix->getData();
+    out << "Matrix [" << w << "," << h << "]\n";
+    out << std::fixed;
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            out << std::setprecision(3) << std::setw(7) << std::right << table[i * w + j];
+        }
+        out << "\n";
+    }
+    out.flush();
 }

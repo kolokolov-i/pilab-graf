@@ -21,5 +21,6 @@ namespace IPF
         void (*processMatrix)(MatrixD matrix);
 
         void setMatrix(MatrixD *m);
+        void setMatrix(MatrixD *m, double min, double max);
     };
 } // namespace IPF
