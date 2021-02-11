@@ -69,7 +69,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aW = w - 1 - (aW % w);
                             }
-                            else
+                            else if(aW < 0)
                             {
                                 aW = -1 - (aW % w);
                             }
@@ -77,7 +77,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aH = h - 1 - (aH % h);
                             }
-                            else
+                            else if(aH < 0)
                             {
                                 aH = -1 - (aH % h);
                             }
@@ -90,17 +90,17 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
                             {
                                 aW = aW % w;
                             }
-                            else
+                            else if(aW < 0)
                             {
-                                aW = w + 1 + (aW % w);
+                                aW = w + (aW % w);
                             }
                             if (aH >= h)
                             {
                                 aH = aH % h;
                             }
-                            else
+                            else if(aH < 0)
                             {
-                                aH = h + 1 + (aH % h);
+                                aH = h + (aH % h);
                             }
                             t = src[aH * w + aW];
                         }
@@ -175,7 +175,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aW = w - 1 - (aW % w);
                             }
-                            else
+                            else if(aW < 0)
                             {
                                 aW = -1 - (aW % w);
                             }
@@ -183,7 +183,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aH = h - 1 - (aH % h);
                             }
-                            else
+                            else if(aH < 0)
                             {
                                 aH = -1 - (aH % h);
                             }
@@ -196,17 +196,17 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
                             {
                                 aW = aW % w;
                             }
-                            else
+                            else if(aW < 0)
                             {
-                                aW = w + 1 + (aW % w);
+                                aW = w + (aW % w);
                             }
                             if (aH >= h)
                             {
                                 aH = aH % h;
                             }
-                            else
+                            else if(aH < 0)
                             {
-                                aH = h + 1 + (aH % h);
+                                aH = h + (aH % h);
                             }
                             t = src[aH * w + aW];
                         }
