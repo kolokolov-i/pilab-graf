@@ -3,12 +3,10 @@
 using namespace IPF;
 
 LabScheme1::LabScheme1()
+    : sourceRecord("src", "Source")
 {
-    sourceRecord.tag = "src";
-    sourceRecord.description = "Source";
-    sourceRecord.empty = true;
-
-    imageTable.push_back(ImageRecord{true, std::shared_ptr<MatrixD>(), Glib::RefPtr<Gdk::Pixbuf>(), "gray", "Grayscale"});
+    imageTable.push_back(ImageRecord("gray", "Grayscale;"));
+    imageTable.push_back(ImageRecord("gaus_s=5_b=zero", "Gauss: s=5 border=zero;"));
     updatePorts();
 }
 
@@ -21,13 +19,17 @@ void LabScheme1::process()
     if (sourceRecord.pixbuf)
     {
         MatrixD *mGray = PixbufUtil::grayMatrix(sourceRecord.pixbuf);
-        imageTable[0].matrix.reset(mGray);
-        imageTable[0].pixbuf = PixbufUtil::grayPixbuf(mGray);
-        imageTable[0].empty = false;
+        imageTable[0].setMatrix(mGray);
+
+        MatrixD *kernel5 = MatrixUtil::kernelGauss(5.0, 12);
+        imageTable[1].setMatrix(MatrixUtil::filterConvolute(mGray, kernel5));
     }
     else
     {
-        imageTable[0].empty = true;
+        for (auto it = imageTable.begin(); it != imageTable.end(); ++it)
+        {
+            it->empty = true;
+        }
     }
     updatePorts();
 }

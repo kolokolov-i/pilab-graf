@@ -19,6 +19,8 @@ protected:
     void cellrenderer_on_toogle(const Glib::ustring &path);
 
     void buildPorts();
+    void resetSource();
+    void resetPorts();
 
     Gtk::Box rootBox, boxToolOpen, boxToolProcess, boxPorts;
     Gtk::Button btnOpen, btnShowSrc, btnProcess, btnSave;
@@ -35,7 +37,7 @@ protected:
             add(col_tag);
         }
 
-        Gtk::TreeModelColumn<Glib::ustring> col_btn;
+        Gtk::TreeModelColumn<gboolean> col_btn;
         Gtk::TreeModelColumn<Glib::ustring> col_descript;
         Gtk::TreeModelColumn<Glib::ustring> col_tag;
     };
@@ -45,7 +47,7 @@ protected:
     Gtk::TreeView lstPorts;
     Glib::RefPtr<Gtk::ListStore> refTreeModel;
 
-    ViewFrame viewFrame;
+    ViewFrame viewSource, viewPort;
     std::string fileName;
 
     LabScheme1 scheme;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MatrixD.h"
+#include "PixbufUtil.h"
 
 #include <gtkmm.h>
 
@@ -10,11 +11,15 @@ namespace IPF
 {
     struct ImageRecord
     {
+        ImageRecord(std::string tag, std::string description);
+
         bool empty;
-        std::shared_ptr<IPF::MatrixD> matrix;
+        std::shared_ptr<MatrixD> matrix;
         Glib::RefPtr<Gdk::Pixbuf> pixbuf;
         std::string tag;
         std::string description;
-        void (*processingFunction)(IPF::MatrixD matrix);
+        void (*processMatrix)(MatrixD matrix);
+
+        void setMatrix(MatrixD *m);
     };
 } // namespace IPF

@@ -50,11 +50,7 @@ void MainFrame::buildGUI()
     btnProcess.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_process_clicked));
     btnSave.signal_clicked().connect(sigc::mem_fun(*this, &MainFrame::btn_save_clicked));
 
-    lblOpen2.set_text("None");
-    btnShowSrc.set_sensitive(false);
-    btnProcess.set_sensitive(false);
-    btnSave.set_sensitive(false);
-
+    resetSource();
     show_all_children();
 }
 
@@ -72,7 +68,7 @@ void MainFrame::buildPorts()
     for (auto it = scheme.ports.begin(); it != scheme.ports.end(); ++it)
     {
         Gtk::TreeModel::Row row = *(refTreeModel->append());
-        row[portsColumns.col_btn] = "btn";
+        row[portsColumns.col_btn] = false;
         row[portsColumns.col_descript] = it->description;
         row[portsColumns.col_tag] = it->tag;
     }
@@ -83,6 +79,12 @@ void MainFrame::buildPorts()
         sigc::mem_fun(*this, &MainFrame::cellrenderer_on_toogle));
     lstPorts.append_column("Description", portsColumns.col_descript);
     lstPorts.append_column("Tag", portsColumns.col_tag);
+
+    auto pColumn = lstPorts.get_column(0);
+    if (pColumn)
+    {
+        pColumn->add_attribute(cell->property_active(), portsColumns.col_btn);
+    }
 }
 
 void MainFrame::btn_open_clicked()
@@ -108,31 +110,56 @@ void MainFrame::btn_open_clicked()
             lblOpen2.set_text(fileName);
             btnShowSrc.set_sensitive(true);
             btnProcess.set_sensitive(true);
+            resetPorts();
+            viewSource.showPort(scheme.getSourcePort());
         }
         catch (std::string message)
         {
             Gtk::MessageDialog dialog(*this, "Error", false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_CLOSE);
             dialog.set_secondary_text(message);
             dialog.run();
+            resetSource();
         }
         break;
     }
     case (Gtk::RESPONSE_CANCEL):
     default:
     {
-        lblOpen2.set_text("None");
-        btnShowSrc.set_sensitive(false);
-        btnProcess.set_sensitive(false);
-        btnSave.set_sensitive(false);
         break;
     }
     }
+}
+
+void MainFrame::resetSource()
+{
+    lblOpen2.set_text("None");
+    btnShowSrc.set_sensitive(false);
+    btnProcess.set_sensitive(false);
+    btnSave.set_sensitive(false);
+    resetPorts();
+}
+
+void MainFrame::resetPorts()
+{
+    auto children = refTreeModel->children();
+    for (auto iter = children.begin(); iter != children.end(); ++iter)
+    {
+        Gtk::TreeModel::Row row = *iter;
+        row.set_value(0, false);
+    }
+    viewPort.reset();
 }
 
 void MainFrame::btn_process_clicked()
 {
     scheme.process();
     btnSave.set_sensitive(true);
+    auto children = refTreeModel->children();
+    for (auto iter = children.begin(); iter != children.end(); ++iter)
+    {
+        Gtk::TreeModel::Row row = *iter;
+        row.set_value(0, true);
+    }
 }
 
 void MainFrame::btn_save_clicked()
@@ -158,10 +185,10 @@ void MainFrame::btn_save_clicked()
 
 void MainFrame::btn_show_clicked()
 {
-    viewFrame.showPort(scheme.getSourcePort());
+    viewSource.showPort(scheme.getSourcePort());
 }
 
 void MainFrame::cellrenderer_on_toogle(const Glib::ustring &path)
 {
-    viewFrame.showPort(scheme.ports[std::atoi(path.c_str())]);
+    viewPort.showPort(scheme.ports[std::atoi(path.c_str())]);
 }

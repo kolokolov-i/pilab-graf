@@ -5,6 +5,7 @@
 #include "../ipf/ImageRecord.h"
 #include "../ipf/MatrixD.h"
 #include "../ipf/PixbufUtil.h"
+#include "../ipf/MatrixUtil.h"
 
 #include <gtkmm.h>
 
