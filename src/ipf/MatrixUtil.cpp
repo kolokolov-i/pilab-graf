@@ -19,7 +19,7 @@ MatrixD *MatrixUtil::identity(int w)
     return resultMatrix;
 }
 
-MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderResolver borderResolver)
+MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel)
 {
     int krnW = kernel->getW();
     int krnH = kernel->getH();
@@ -31,8 +31,6 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
     int krnKH = krnH / 2;
     int w = image->getW();
     int h = image->getH();
-    const double *src = image->getData();
-    const double *krn = kernel->getData();
     double *result = new double[w * h];
     for (int iH = 0; iH < h; iH++)
     {
@@ -43,79 +41,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
             {
                 for (int jW = 0, kW = -krnKW; jW < krnW; jW++, kW++)
                 {
-                    double t;
-                    int aW, aH;
-                    aW = iW + kW;
-                    aH = iH + kH;
-                    if (aW < 0 || aH < 0 || aW >= w || aH >= h)
-                    {
-                        switch (borderResolver)
-                        {
-                        case BorderResolver::Replicate:
-                        {
-                            if (aW < 0 || aW >= w)
-                            {
-                                aW = iW;
-                            }
-                            if (aH < 0 || aH >= h)
-                            {
-                                aH = iH;
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Reflect:
-                        {
-                            if (aW >= w)
-                            {
-                                aW = w - 1 - (aW % w);
-                            }
-                            else if (aW < 0)
-                            {
-                                aW = -1 - (aW % w);
-                            }
-                            if (aH >= h)
-                            {
-                                aH = h - 1 - (aH % h);
-                            }
-                            else if (aH < 0)
-                            {
-                                aH = -1 - (aH % h);
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Wrap:
-                        {
-                            if (aW >= w)
-                            {
-                                aW = aW % w;
-                            }
-                            else if (aW < 0)
-                            {
-                                aW = w + (aW % w);
-                            }
-                            if (aH >= h)
-                            {
-                                aH = aH % h;
-                            }
-                            else if (aH < 0)
-                            {
-                                aH = h + (aH % h);
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Zero:
-                        default:
-                            t = 0;
-                        }
-                    }
-                    else
-                    {
-                        t = src[aH * w + aW];
-                    }
-                    v += t * krn[jH * krnW + jW];
+                    v += image->getValue(iW+kW, iH+kH) * kernel->getValue(jW, jH);
                 }
             }
             result[iH * w + iW] = v;
@@ -125,7 +51,7 @@ MatrixD *MatrixUtil::filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderRes
     delete[] result;
     return resultMatrix;
 }
-MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderResolver borderResolver)
+MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel)
 {
     int krnW = kernel->getW();
     int krnH = kernel->getH();
@@ -137,8 +63,6 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
     int krnKH = krnH / 2;
     int w = image->getW();
     int h = image->getH();
-    const double *src = image->getData();
-    const double *krn = kernel->getData();
     double *result = new double[w * h];
     for (int iH = 0; iH < h; iH++)
     {
@@ -149,79 +73,7 @@ MatrixD *MatrixUtil::filterConvolute(MatrixD *image, MatrixD *kernel, BorderReso
             {
                 for (int jW = 0, kW = -krnKW; jW < krnW; jW++, kW++)
                 {
-                    double t;
-                    int aW, aH;
-                    aW = iW + kW;
-                    aH = iH + kH;
-                    if (aW < 0 || aH < 0 || aW >= w || aH >= h)
-                    {
-                        switch (borderResolver)
-                        {
-                        case BorderResolver::Replicate:
-                        {
-                            if (aW < 0 || aW >= w)
-                            {
-                                aW = iW;
-                            }
-                            if (aH < 0 || aH >= h)
-                            {
-                                aH = iH;
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Reflect:
-                        {
-                            if (aW >= w)
-                            {
-                                aW = w - 1 - (aW % w);
-                            }
-                            else if (aW < 0)
-                            {
-                                aW = -1 - (aW % w);
-                            }
-                            if (aH >= h)
-                            {
-                                aH = h - 1 - (aH % h);
-                            }
-                            else if (aH < 0)
-                            {
-                                aH = -1 - (aH % h);
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Wrap:
-                        {
-                            if (aW >= w)
-                            {
-                                aW = aW % w;
-                            }
-                            else if (aW < 0)
-                            {
-                                aW = w + (aW % w);
-                            }
-                            if (aH >= h)
-                            {
-                                aH = aH % h;
-                            }
-                            else if (aH < 0)
-                            {
-                                aH = h + (aH % h);
-                            }
-                            t = src[aH * w + aW];
-                        }
-                        break;
-                        case BorderResolver::Zero:
-                        default:
-                            t = 0;
-                        }
-                    }
-                    else
-                    {
-                        t = src[aH * w + aW];
-                    }
-                    v += t * krn[jH * krnW + jW];
+                    v += image->getValue(iW-kW, iH-kH) * kernel->getValue(jW, jH);
                 }
             }
             result[iH * w + iW] = v;
@@ -304,22 +156,19 @@ MatrixD *MatrixUtil::kernelGaussV(double vrc, int sizeW, int sizeH)
     return resultMatrix;
 }
 
-MatrixD *MatrixUtil::calc(MatrixD *matrix, double (*unaryFunction)(double a))
+MatrixD *MatrixUtil::calc(MatrixD *mP, double (*unaryFunction)(double a))
 {
-    int w = matrix->getW();
-    int h = matrix->getH();
-    int n = w * h;
-    double *result = new double[n];
-    const double *src = matrix->getData();
-    const double *p1 = src;
-    double *r = result;
-    for (int i = 0; i < n; i++, p1++, r++)
+    int w = mP->getW();
+    int h = mP->getH();
+    MatrixD *mR = new MatrixD(w, h);
+    for(int y = 0; y<h; y++)
     {
-        *r = unaryFunction(*p1);
+        for(int x = 0; x<w; x++)
+        {
+            mR->setValue(x, y, unaryFunction(mP->getValue(x, y)));
+        }
     }
-    MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete[] result;
-    return resultMatrix;
+    return mR;
 }
 
 MatrixD *MatrixUtil::calc(MatrixD *m1, MatrixD *m2, double (*binaryFunction)(double a, double b))
@@ -330,34 +179,28 @@ MatrixD *MatrixUtil::calc(MatrixD *m1, MatrixD *m2, double (*binaryFunction)(dou
     }
     int w = m1->getW();
     int h = m1->getH();
-    int n = w * h;
-    double *result = new double[n];
-    const double *src1 = m1->getData();
-    const double *p1 = src1;
-    const double *src2 = m2->getData();
-    const double *p2 = src2;
-    double *r = result;
-    for (int i = 0; i < n; i++, p1++, p2++, r++)
+    MatrixD *mR = new MatrixD(w, h);
+    for(int y = 0; y<h; y++)
     {
-        *r = binaryFunction(*p1, *p2);
+        for(int x = 0; x<w; x++)
+        {
+            mR->setValue(x, y, binaryFunction(m1->getValue(x, y), m2->getValue(x, y)));
+        }
     }
-    MatrixD *resultMatrix = new MatrixD(w, h, result);
-    delete[] result;
-    return resultMatrix;
+    return mR;
 }
 
 void MatrixUtil::print(std::ostream &out, MatrixD *matrix)
 {
     int w = matrix->getW();
     int h = matrix->getH();
-    const double *table = matrix->getData();
     out << "Matrix [" << w << "," << h << "]\n";
     out << std::fixed;
-    for (int i = 0; i < h; i++)
+    for (int y = 0; y < h; y++)
     {
-        for (int j = 0; j < w; j++)
+        for (int x = 0; x < w; x++)
         {
-            out << std::setprecision(3) << std::setw(7) << std::right << table[i * w + j];
+            out << std::setprecision(3) << std::setw(7) << std::right << matrix->getValue(x, y);
         }
         out << "\n";
     }

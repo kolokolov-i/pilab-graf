@@ -4,11 +4,20 @@ namespace IPF
 {
     class MatrixD
     {
-    private:
+    protected:
         int w, h;
         double *data;
 
     public:
+
+        enum BorderResolver
+        {
+            Zero,
+            Replicate,
+            Reflect,
+            Wrap
+        };
+
         MatrixD(int w, int h);
         MatrixD(int w, int h, double value);
         MatrixD(int w, int h, const double *data);
@@ -16,6 +25,9 @@ namespace IPF
 
         int getW();
         int getH();
-        const double *getData();
+        double getValue(int x, int y);
+        void setValue(int x, int y, double v);
+        BorderResolver borderResolver;
+
     };
 } // namespace IPF

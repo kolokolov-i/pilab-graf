@@ -43,21 +43,25 @@ void LabScheme1::process()
 
         // different border types
         MatrixD *mKGaus5 = MatrixUtil::kernelGaussQ(5.0);
+        mGray->borderResolver = MatrixD::Zero;
         imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5));
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5, BorderResolver::Replicate));
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5, BorderResolver::Reflect));
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5, BorderResolver::Wrap));
+        mGray->borderResolver = MatrixD::Replicate;
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5));
+        mGray->borderResolver = MatrixD::Reflect;
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5));
+        mGray->borderResolver = MatrixD::Wrap;
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5));
+        mGray->borderResolver = MatrixD::Replicate;
 
         // Gaussian filter
         MatrixD *mKGaus3 = MatrixUtil::kernelGaussQ(3.0);
         // MatrixUtil::print(std::cout, mKGaus3);
         MatrixD *mKGaus4 = MatrixUtil::kernelGaussQ(4.0);
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus3, BorderResolver::Replicate));
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus4, BorderResolver::Replicate));
-        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5, BorderResolver::Replicate));
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus3));
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus4));
+        imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mKGaus5));
         imageTable[i++].setMatrix(MatrixUtil::filterConvolute(
-            MatrixUtil::filterConvolute(mGray, mKGaus3, BorderResolver::Replicate),
-            mKGaus4, BorderResolver::Replicate));
+            MatrixUtil::filterConvolute(mGray, mKGaus3), mKGaus4));
 
         // Sobel
         double tableX[] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
@@ -78,8 +82,7 @@ void LabScheme1::process()
         imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mGausX));
         imageTable[i++].setMatrix(MatrixUtil::filterConvolute(mGray, mGausY));
         imageTable[i++].setMatrix(MatrixUtil::filterConvolute(
-            MatrixUtil::filterConvolute(mGray, mGausX),
-            mGausY));
+            MatrixUtil::filterConvolute(mGray, mGausX), mGausY));
     }
     else
     {

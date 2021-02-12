@@ -6,20 +6,13 @@
 
 namespace IPF
 {
-    enum class BorderResolver
-    {
-        Zero,
-        Replicate,
-        Reflect,
-        Wrap
-    };
 
     class MatrixUtil
     {
     public:
         static MatrixD *identity(int w);
-        static MatrixD *filterCrossCorel(MatrixD *image, MatrixD *kernel, BorderResolver borderResolver = BorderResolver::Replicate);
-        static MatrixD *filterConvolute(MatrixD *image, MatrixD *kernel, BorderResolver borderResolver = BorderResolver::Replicate);
+        static MatrixD *filterCrossCorel(MatrixD *image, MatrixD *kernel);
+        static MatrixD *filterConvolute(MatrixD *image, MatrixD *kernel);
         static MatrixD *calc(MatrixD *m1, double (*unaryFunction)(double a));
         static MatrixD *calc(MatrixD *m1, MatrixD *m2, double (*binaryFunction)(double a, double b));
 

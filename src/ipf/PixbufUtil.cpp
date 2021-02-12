@@ -26,33 +26,33 @@ MatrixD *PixbufUtil::grayMatrix(Glib::RefPtr<Gdk::Pixbuf> px)
 
 Glib::RefPtr<Gdk::Pixbuf> PixbufUtil::grayPixbuf(MatrixD *matrix, double min, double max)
 {
-    const double *data = matrix->getData();
     int w = matrix->getW();
     int h = matrix->getH();
     Glib::RefPtr<Gdk::Pixbuf> result = Gdk::Pixbuf::create(Gdk::Colorspace::COLORSPACE_RGB, false, 8, w, h);
-    int n = w * h;
-    const double *p1 = data;
     guint8 *p2 = result->get_pixels();
     double factor = 255 / (max - min); // normalization
-    for (int i = 0; i < n; i++)
+    for (int y = 0; y < h; y++)
     {
-        double m = *p1++;
-        m = (m - min) * factor;
-        guint8 t;
-        if (m >= 0 && m <= 255)
+        for (int x = 0; x < w; x++)
         {
-            t = (guint8)m;
+            double m = matrix->getValue(x, y);
+            m = (m - min) * factor;
+            guint8 t;
+            if (m >= 0 && m <= 255)
+            {
+                t = (guint8)m;
+            }
+            else
+            {
+                if (m < 0)
+                    t = 0;
+                if (m > 255)
+                    t = 255;
+            }
+            *p2++ = t;
+            *p2++ = t;
+            *p2++ = t;
         }
-        else
-        {
-            if (m < 0)
-                t = 0;
-            if (m > 255)
-                t = 255;
-        }
-        *p2++ = t;
-        *p2++ = t;
-        *p2++ = t;
     }
     return result;
 }
